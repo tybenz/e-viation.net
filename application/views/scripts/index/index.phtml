@@ -1,0 +1,61 @@
+<?php  $this->layout()->setLayout('home_page'); ?>
+
+<?php 
+    $controller = Zend_Controller_Front::getInstance()->getRequest()->getControllerName();
+    
+    $first = 0;
+?>
+
+<h1 style="font-weight: normal; font-size: 37px; color: #ddd; margin-bottom: 5px; width: 1140px; margin: auto;">TODAY'S ADS</h1>
+
+<div class="item-list" id="recent" style="margin-top: 10px;">
+            <?php foreach($this->ads as $item) {?>
+
+                    <div class="item">
+                            <?php if($item['ads_image1'] != '') {?>
+                            <div class="image-container">
+                                <div class="image-position">
+                                    <img alt="No image" src="<?php echo $item['ads_image1']; ?>" />
+                                    <img alt="No image" style="display: none;" src="<?php if($item['ads_image2'] != ''){echo htmlspecialchars($item['ads_image2']);} else {echo '#';}?>" />
+                                    <img alt="No image" style="display: none;" src="<?php if($item['ads_image3'] != ''){echo htmlspecialchars($item['ads_image3']);} else {echo '#';}?>" />
+                                    <img alt="No image" style="display: none;" src="<?php if($item['ads_image4'] != ''){echo htmlspecialchars($item['ads_image4']);} else {echo '#';}?>" />
+                                    <img alt="No image" style="display: none;" src="<?php if($item['ads_image5'] != ''){echo htmlspecialchars($item['ads_image5']);} else {echo '#';}?>" />
+                                </div>
+                            </div>
+                            <?php } else { ?>
+                            <div class="image-container"><div class="image-position" style="background-image:url('/images/default.png'); background-position: 6px 1px;">&nbsp;&nbsp;No Image</div></div>
+                            <?php } ?>
+                            <div class="title"><?php if(isset($item['adt_type'])) {
+                                    echo $item['adt_type'] . ' - ';
+                                }
+                                echo $item['ads_title']?>
+                            </div>
+                            <div class="description"><strong>DESCRIPTION:</strong>  <?php echo stripslashes($item['ads_description']) ?></div>
+                            <a class="read-more-link" href="">Read more</a>
+                            <table class="info">
+                                    <tr><th>Date</th><th>Donation</th><th>Price</th></tr>
+                                    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+                                    <tr><td><?php echo date('M j, Y', strtotime($item['ads_timestamp']))?></td><td><?php echo $item['dnt_formatted_value'] ?></td><td><?php echo '$' . $item['ads_price']?></td></tr>
+                            </table>
+                            <a href="#" class="flyitnow"><img src="/images/flyitnow.png" alt="FLY IT NOW!"/></a>
+                    </div>
+
+                <?php   } 
+                
+                if(empty($this->ads)) {
+                ?>
+                    <div class="item" style="margin-bottom: 40px;">
+                        <p style="margin: auto; color: #000; margin: 20px">No ads!!!</p>
+                    </div>
+                <?php
+                
+                }
+                
+                if(isset($this->page_num['recent'])) {
+                    echo $this->pagination(array('table_name' => 'recent'));
+                }
+                ?>
+</div>
+                    
+
+

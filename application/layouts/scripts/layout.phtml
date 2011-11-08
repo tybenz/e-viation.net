@@ -1,0 +1,133 @@
+<!-- application/layouts/scripts/layout.phtml -->
+<?php echo $this->doctype() ?>
+<?php 
+    $users = new Application_Model_Users();
+    $front = Zend_Controller_Front::getInstance();
+    $request = $front->getRequest();
+
+    //passing current controller and action for use in view
+    $temp_controller = $request->getControllerName();
+    $temp_action = $request->getActionName();
+?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>e-Viation Marketplace</title>
+  <script src="http://code.jquery.com/jquery.js"></script>
+  <script src="http://code.jquery.com/ui/1.8.14/jquery-ui.js"></script>
+  <script type="text/javascript" src="/js/layout.js"></script>
+  <?php echo $this->headLink()->appendStylesheet('/css/styles.css') ?>
+</head>
+<body>
+<div id="login-window-blur">
+    <div id="login-window">
+        <a href="#" id="login-close">X</a>
+        <form id="login-form" method="post" action="<?php echo($this->url(array('action' => 'login'), NULL, true))?>">
+            <img src="/images/login_logo.png" /><br/><br/>
+            <label for="usr_email">Email</label><input name="usr_email" />
+            <label for="usr_password">Password</label><input type="password" name="usr_password" />
+            <input style="display: none;" name="token" value="<?php echo $this->login_token ?>"/>
+            <button id="login-submit" type="submit">Login</button>
+            <button id="register-button" type="button">Register</button>
+            <div id="login-error" style="display: none; width: 350px; position: relative; top: 15px; left: 100px; text-align: center;"></div>
+        </form>
+
+        
+        
+        <form id="register-form" method="post" style="display: none;" action="<?php echo($this->url(array('action' => 'register'), NULL, true)) ?>">
+            <img src="/images/register_logo.png" /><br/><br/>
+            <input name="usr_fname" /><label for="fname">First Name</label><br/><br/>
+            <input name="usr_lname" /><label for="lname">Last Name</label><br/><br/>
+            <input name="usr_email" /><label for="email">Email</label><br/><br/>
+            <input type="password" name="usr_password" /><label for="password">Password</label><br/><br/>
+            <input type="password" name="usr_password2" /><label for="password2">Re-enter Password</label><br/><br/>
+            <button id="register-submit" type="submit">Register</button><label id="register-error"></label>
+        </form>
+    </div>
+</div>
+<div style="height: auto !important; height: 100%; min-height: 100%;">
+<div style="padding-bottom: 112px;">
+
+	<div class="header-container">
+		<div class="header">
+			<div class="title">
+				<!--image goes here-->
+				<img id="logo" src="/images/logo.png" />
+				
+				<div class="top-menu-wrapper">
+					<div class="top-menu">
+                        <?php 
+                            if(isset($this->usr_email)) {
+                                $user = $users->getAllUsers(array('usr_email' => $this->usr_email));
+                                $user = reset($user);
+                        ?>
+                        <span><a id="logout-link" href="">LOGOUT</a></span>
+                        <?php
+                                
+                            } else {
+                        ?>
+						<span><a id="login-link" href="#">LOGIN</a></span>
+                        <?php } ?>
+						<span><a href="#">PLACE AD</a></span>
+						<span><a href="#">SITEMAP</a></span>
+						<span><a href="#">HELP</a></span>
+					</div>
+					<form id="search" method="post" action="#">
+						<input name="search" style="width: 240px;"/>&nbsp;<button type="submit">SEARCH</button>
+					</form>
+				</div>
+			</div>
+			
+			
+
+			
+		</div>
+	</div>
+	
+	<div class="main-menu-container">
+        <div class="main-menu">
+            <?php $main_menu = array(
+                    'home' => array('href' => $this->url(array('controller' => 'index'), NULL, true)),
+                    'aircraft' => array('href' => $this->url(array('controller' => 'aircraft'), NULL, true)),
+                    'project' => array('href' => $this->url(array('controller' => 'project'), NULL, true)),
+                    'parts' => array('href' => $this->url(array('controller' => 'parts'), NULL, true)),
+                    'everything-else' => array('href' => $this->url(array('controller' => 'everything-else'), NULL, true)),
+                    'donations' => array('href' => $this->url(array('controller' => 'donations'), NULL, true)),
+                );
+            ?>
+            <?php
+            foreach($main_menu as $key => $link) {
+                
+                if($key == $temp_controller || ($key == 'home' && $temp_controller == 'index')) {
+                    echo('<span><a href="' . $link['href'] . '" class="active">' . strtoupper($key) . '</a></span>');
+                } else {
+                    echo('<span><a href="' . $link['href'] . '">' . strtoupper($key) . '</a></span>');
+                }
+            }
+            ?>
+		</div>
+	</div>
+    
+    
+    
+<?php echo $this->layout()->content ?>
+</div>
+</div>
+    
+<div class="main-menu-container" style="margin-top: -112px; font-size: 12px; float: bottom; border-top: 1px solid #ccc;">
+        <div class="main-menu">
+                <span><a href="/">HOME</a></span>
+                <span><a href="/aircraft">AIRCRAFT</a></span>
+                <span><a href="#">PROJECTS</a></span>
+                <span><a href="#">PARTS</a></span>
+                <span><a href="#">EVERTHING ELSE</a></span>
+                <span><a href="#">DONATIONS</a></span>
+        </div>
+</div>
+
+<div class="footer" style="">
+        Copyright &copy; 2008 e-Viation Marketplace. All Rights Reserved. See our Terms and Services.
+</div>
+    
+</body>
+</html>

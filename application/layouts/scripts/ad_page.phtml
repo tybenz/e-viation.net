@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<!-- application/layouts/scripts/layout.phtml -->
+<?php 
+    $users = new Application_Model_Users();
+    $front = Zend_Controller_Front::getInstance();
+    $request = $front->getRequest();
+
+    //passing current controller and action for use in view
+    $temp_controller = $request->getControllerName();
+    $temp_action = $request->getActionName();
+?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>e-Viation Marketplace</title>
+  <script src="http://code.jquery.com/jquery.js"></script>
+  <script src="http://code.jquery.com/ui/1.8.14/jquery-ui.js"></script>
+  <script type="text/javascript" src="/js/layout.js"></script>
+  <script type="text/javascript" src="/js/ajaxfileupload.js"></script>
+  <?php echo $this->headLink()->appendStylesheet('/css/styles.css') ?>
+  
+   <!--[if IE]>
+    <STYLE type="text/css">
+    .image-container { position: relative; }
+    .image-position { position: absolute; top: 50%; }
+    .image-container img { position: relative; top: -50%; }
+    </STYLE>
+   <![endif]-->
+</head>
+<body>
+<div id="login-window-blur">
+    <div id="login-window">
+        <a href="#" id="login-close">X</a>
+        <form id="login-form" method="post" action="<?php echo($this->url(array('action' => 'login'), NULL, true))?>">
+            <img src="/images/login_logo.png" alt="e-VIATION LOGIN"/><br/><br/>
+            <label for="usr_email">Email</label><input id="usr_email" name="usr_email" />
+            <label for="usr_password">Password</label><input id="usr_password" type="password" name="usr_password" />
+            <input style="display: none;" name="token" value="<?php echo $this->login_token ?>"/>
+            <button id="login-submit" type="submit">Login</button>
+            <button id="register-button" type="button">Register</button>
+            <div id="login-error" style="display: none; width: 350px; position: relative; top: 15px; left: 100px; text-align: center;"></div>
+        </form>
+
+        
+        
+        <form id="register-form" method="post" style="display: none;" action="<?php echo($this->url(array('action' => 'register'), NULL, true)) ?>">
+            <img src="/images/register_logo.png" alt="e-VIATION REGISTER"/><br/><br/>
+            <input name="usr_fname" id="usr_fname"/><label for="usr_fname">First Name</label><br/><br/>
+            <input name="usr_lname" id="usr_lname"/><label for="usr_lname">Last Name</label><br/><br/>
+            <input name="usr_email" id="usr_email"/><label for="usr_email">Email</label><br/><br/>
+            <input type="password" name="usr_password" id="usr_password_register"/><label for="usr_password_register">Password</label><br/><br/>
+            <input type="password" name="usr_password2" id="usr_password2_register"/><label for="usr_password2_register">Re-enter Password</label><br/><br/>
+            <button id="register-submit" type="submit">Register</button><label id="register-error"></label>
+        </form>
+    </div>
+</div>
+    
+<div id="post-ad-window-blur">
+    <div id="post-ad-window">
+        <a href="" id="post-ad-close">X</a>
+        
+            <div id="post-ad-message"><span>You must be logged in to place an ad.</span></div>
+        
+        <form id="post-ad-form" enctype="multipart/form-data" method="post" action="<?php echo($this->url(array('action' => 'post-ad'), NULL, true))?>" target="post_target">
+            <img src="/images/post_ad_logo.png" alt="e-VIATION PLACE AD"/>
+            <br /><br/>
+            <div id="post-ad-image-block">
+                <br /><br />
+                <label for="ads_image1">Image 1</label><input id="ads_image1" name="ads_image1" type="file"/><br /><br />
+                <label for="ads_image2">Image 2</label><input id="ads_image2" name="ads_image2" type="file"/><br /><br />
+                <label for="ads_image3">Image 3</label><input id="ads_image3" name="ads_image3" type="file"/><br /><br />
+                <label for="ads_image4">Image 4</label><input id="ads_image4" name="ads_image4" type="file"/><br /><br />
+                <label for="ads_image5">Image 5</label><input id="ads_image5" name="ads_image5" type="file"/>
+            </div>
+            <div id="post-ad-form-block">
+                <input type="hidden" value="<?php echo $this->user['usr_id'] ?>" name="ads_user" />
+                <label for="ads_title">Title</label><input style=" width: 198px" id="ads_title" name="ads_title"/><label style="display: inline; margin-left: 10px;" for="ads_type">Type</label><select id="ads_type" name="ads_type" style="width: 45px;"><option value="">&nbsp;</option><option value="1">FS</option><option value="2">W</option><option value="3">A</option><option value="4">FT</option></select><br /><br />
+                <label for="ads_price">Price</label><input style="width: 100px" id="ads_price" name="ads_price" /><label style="display: inline; margin-left: 10px;" for="ads_donations_type_id">Donation</label><select id="ads_donations_type_id" style="width: 113px;" name="ads_donations_type_id" ><option value="">&nbsp;</option><?php foreach($this->donations_types as $t){ echo '<option value="' . $t['dnt_id_pk'] . '">' . $t['dnt_formatted_value'] . '</option>'; }?></select><br /><br />
+                <label for="category-select">Category</label><select id="category-select" style="width: 106px;" name="adc_category"><option value="">&nbsp;</option><?php foreach($this->categories as $c){echo '<option value="' . $c['adc_id_pk'] . '">' . ucwords(implode(' ', explode('-', $c['adc_label']))) . '</option>';}?></select><label style="display: inline; margin-left: 10px;" for="subcategory-select">-</label><select id="subcategory-select" style="width: 172px;" name="ads_subcategory_id"><option value="">&nbsp;</option><?php foreach($this->subcategories as $s){echo '<option value="' . $s['asc_id_pk'] . '" data-category-id="' . $s['asc_category_id'] . '">' . ucwords(implode(' ', explode('-', $s['asc_label'])))  . '</option>';}?></select><br /><br />
+                <label style="position: relative; bottom: 95px;">Description</label><textarea name="ads_description"></textarea><br /><br />
+
+                
+                <button id="post-ad-submit" type="submit">Post this ad</button>
+                <span id="post-ad-error">All fields must be filled</span>
+            </div>
+        </form>
+        
+        <iframe name="post_target" src="#" style="display: none;"></iframe>
+    </div>
+    <div class="item-list" style="background: #000; width: 1100px; position:relative; top:-63px; border: 3px solid #378ee1;padding: 20px; z-index: 0">
+        <div class="item" style="margin: 0 auto; width: 1026px;">
+            <div class="image-container"><div class="image-position" style="background-image:url('/images/default.png'); background-position: 6px 1px;">&nbsp;&nbsp;No Image</div></div>
+            <div class="title">TITLE</div>
+            <div class="description"><strong>DESCRIPTION</strong></div>
+
+            <table class="info">
+                    <tr><th>Date</th><th>Donation</th><th>Price</th></tr>
+                    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+                    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+            </table>
+            <a href="#" class="flyitnow"><img src="/images/flyitnow.png" alt="FLY IT NOW!"/></a>
+
+        </div>
+    </div>
+</div>
+    
+<div id="logout-window-blur">
+    <div id="logout-window">
+        <a href="/" id="logout-close">X</a>
+        <div id="logout-message"><span>You have successfully logged out.</span></div>
+    </div>
+</div>
+    
+<div id="sitemap-window-blur">
+    <div id="sitemap-window">
+        <a href="#" id="sitemap-close">X</a>
+        <img src="/images/sitemap_logo.png" alt="e-VIATION SITEMAP"/>
+        <ul id="sitemap">
+        <?php
+            foreach($this->sitemap as $key => $con) {
+                $label = ucwords(implode(' ', explode('-', $key)));
+                echo '<li><a href="' . $key . '">' . $label . '</a></li>';
+                if(!empty($con)) {
+                    echo '<ul>';
+                    foreach($con as $act) {
+                        echo '<li><a href="' . $key . '/' . $act['link'] . '">' . $act['label'] . '</a></li>';
+                    }
+                    echo '</ul>';
+                }
+            }
+        
+        ?></ul>
+    </div>
+</div>
+    
+<div id="read-more-close">X</div>
+    
+<div id="read-more"></div>
+
+<div id="photo-viewer">
+    <div id="photo-viewer-close">X</div>
+    <div id="large-container">
+        <div id="large-position">
+        </div>
+    </div>
+    <div id="thumbnails">
+        <div class="small-container">
+            <div class="small-position">
+            </div>
+        </div>
+        <div class="small-container">
+            <div class="small-position">
+            </div>
+        </div>
+        <div class="small-container">
+            <div class="small-position">
+            </div>
+        </div>
+        <div class="small-container">
+            <div class="small-position">
+            </div>
+        </div>
+        <div class="small-container">
+            <div class="small-position">
+            </div>
+        </div>
+    </div>
+    
+</div>
+    
+<div style="height: auto !important; height: 100%; min-height: 100%;">
+<div style="padding-bottom: 112px;">
+
+	<div class="header-container">
+		<div class="header">
+			<div class="title">
+				<!--image goes here-->
+				<img id="logo" src="/images/logo.png" alt="e-VIATION"/>
+				
+				<div class="top-menu-wrapper">
+					<div class="top-menu">
+                        <?php 
+                            if(isset($this->usr_email)) {
+                                $user = $users->getAllUsers(array('usr_email' => $this->usr_email));
+                                $user = reset($user);
+                        ?>
+                        <span><a id="logout-link" href="">LOGOUT</a></span>
+                        <?php
+                                
+                            } else {
+                        ?>
+						<span><a id="login-link" href="#">LOGIN</a></span>
+                        <?php } ?>
+						<span><a id="post-ad-link" href="#">PLACE AD</a></span>
+						<span><a id="sitemap-link" href="#">SITEMAP</a></span>
+						<span><a href="#">HELP</a></span>
+					</div>
+					<form id="search" method="post" action="#">
+						<input name="search" style="width: 240px;"/>&nbsp;<button type="submit">SEARCH</button>
+					</form>
+				</div>
+			</div>
+			
+			
+
+			
+		</div>
+	</div>
+	
+	<div class="main-menu-container">
+        <div class="main-menu">
+            <?php $main_menu = array(
+                    'home' => array('href' => $this->url(array('controller' => 'index'), NULL, true)),
+                    'aircraft' => array('href' => $this->url(array('controller' => 'aircraft'), NULL, true)),
+                    'project' => array('href' => $this->url(array('controller' => 'project'), NULL, true)),
+                    'parts' => array('href' => $this->url(array('controller' => 'parts'), NULL, true)),
+                    'everything-else' => array('href' => $this->url(array('controller' => 'everything-else'), NULL, true)),
+                    'donations' => array('href' => $this->url(array('controller' => 'donations'), NULL, true)),
+                );
+            ?>
+            <?php
+            foreach($main_menu as $key => $link) {
+                
+                if($key == $temp_controller || ($key == 'home' && $temp_controller == 'index')) {
+                    echo('<span><a href="' . $link['href'] . '" class="active">' . strtoupper($key) . '</a></span>');
+                } else {
+                    echo('<span><a href="' . $link['href'] . '">' . strtoupper($key) . '</a></span>');
+                }
+            }
+            ?>
+		</div>
+	</div>
+    
+    <div class="main">
+    
+    <div id="big-logo-wrapper" style="height: 194px;">
+        <img id="big_logo" src="/images/big_logo.png" alt="e-VIATION"/>
+    </div>
+        <?php 
+            
+            if(!isset($this->active_tab)) {
+                foreach($this->tabs[$temp_controller] as $key => $t) {
+                    if($t['active'])
+                    $this->active_tab = $key;
+                }
+            }
+        ?>
+        
+        <div class="submenu-wrapper">
+                <span id="category" style="font-size: 30px; color: #fff"><?php echo ucwords(str_replace('-', ' ', $temp_controller)) . ' - ' . ucwords(str_replace('-', ' ', $this->active_tab)); ?></span>
+
+                <div id="submenu">
+                <?php
+                    
+                
+                    foreach($this->tabs[$temp_controller] as $key => $t){
+                        if($this->active_tab == $key) {
+                            $active = 'active';
+                        } else {
+                            $active = '';
+                        }
+                        echo '<a href="" class="' . $active . '" id="' . $key . '">' . $t['label'] . '</a>';
+                    }
+                
+                ?>
+                </div>
+
+                <form method="post" action="#">
+                        <input name="search" style="width: 220px;"/>&nbsp;&nbsp;<select style="width: 180px;"><option value="">&nbsp;</option></select>&nbsp;<button type="submit">SEARCH</button>
+                </form>
+        </div>
+    
+<?php echo $this->layout()->content ?>
+    </div>
+</div>
+</div>
+    
+<div class="main-menu-container" style="margin-top: -112px; font-size: 12px; float: bottom; border-top: 1px solid #ccc;">
+        <div class="main-menu">
+                <span><a href="/">HOME</a></span>
+                <span><a href="/aircraft">AIRCRAFT</a></span>
+                <span><a href="#">PROJECTS</a></span>
+                <span><a href="#">PARTS</a></span>
+                <span><a href="#">EVERTHING ELSE</a></span>
+                <span><a href="#">DONATIONS</a></span>
+        </div>
+</div>
+
+<div class="footer" style="">
+        Copyright &copy; 2008 e-Viation Marketplace. All Rights Reserved. See our Terms and Services.
+</div>
+    
+</body>
+</html>
