@@ -1,4 +1,5 @@
 <?php
+var_dump("THIS IS A TEST");exit;
 
 // Define path to application directory
 defined('APPLICATION_PATH')
